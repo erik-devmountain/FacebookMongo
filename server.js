@@ -1,61 +1,56 @@
-var express = require('express'),
-	session = require('express-session'),
-	passport = require('passport'),
-	passportFacebook = require('passport-facebook'),
-	FacebookStrategy = require('passport-facebook').Strategy,
-	port = 9006;
-	app = express();
+var Express = require('express');
+var Session = require('express-session');
+var Passport = require('passport');
+var FacebookStrategy = require('passport-facebook').Strategy;
 
-app.listen(port, function(){
-	console.log('Now listening on port ' + port);
-});
+var App = Express();
 
-app.use(session({secret: 'thisisSECRET'}));
-app.use(passport.initialize());
-app.use(passport.session());
+//middleware
 
-passport.use(
-	new FacebookStrategy({
-		clientID: '1504075296519770',
-		clientSecret: '73ac9b8f04ce1986fa11cae553e67c97',
-		callbackURL: 'http://localhost:9006/auth/facebook/callback'
-	}, function(token, refreshToken, profile, done){
-		return done(null, profile);
-	}
-));
+App.use(Session({secret: 'SOMETHING_SIKRIT'}));
+App.use(Passport.initialize());
+App.use(Passport.session());
 
-passport.serializeUser(function(user, done){
+Passport.use(new FacebookStrategy({
+	clientID: '767050560051516',
+	clientSecret: '7f61fe8de4d1f9ffc2061d89073a73bb',
+	callbackURL: 'http://localhost:9001/auth/facebook/callback'
+}, function(token, refreshToken, profile, done){
+	return done(null, profile);
+}));
+
+Passport.serializeUser(function(user, done){
 	done(null, user);
 });
-passport.deserializeUser(function(obj, done){
+
+Passport.deserializeUser(function(obj, done){
 	done(null, obj);
-});
+})
 
-var requireAuth = function(req, res, next){
-	if(req.user){
-		res.status(200).send(JSON.stringify(req.user));
-	} else{
-		res.send('Please Login');
-	}
-};
-
-
-app.get('/auth/facebook', passport.authenticate('facebook'));
-app.get('/auth/facebook/callback', passport.authenticate('facebook',
-	{
-		successRedirect: '/authenticated',
-		failureRedirect: '/login'
-	})/*, function(req, res){
-		res.status(200).redirect('/authenticated');
-}*/);
-app.get('/me', function(req, res){
-	if(req.user){
-		res.status(200).send(JSON.stringify(req.user));
+var isAuthed = function(req, res, next){
+	if(!req.isAuthenticated()){
+		res.redirect('/failure');
 	} else {
-		res.status(200).send('Please Log In');
+		next();
 	}
-});
-// app.get('/authenticated', passport.authenticate('facebook',
-// 	{
+}
 
-// 	}))
+App.get('/me', isAuthed, function(req, res){
+	res.json(req.user);
+})
+
+
+App.get('/auth/facebook', Passport.authenticate('facebook'));
+
+App.get('/auth/facebook/callback', 
+	Passport.authenticate(
+		'facebook', 
+		{
+			successRedirect: '/me',
+			failureRedirect: '/failure'
+		}
+	))
+
+App.listen(9001, function(){
+	console.log('Now listening on port: 9001')
+});
