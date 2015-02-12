@@ -20,6 +20,9 @@
   "dependencies": {
     "express": "^4.11.2",
     "express-session": "^1.10.2",
+    "mongodb": "^1.4.30",
+    "mongojs": "^0.18.1",
+    "mongoose": "^3.8.23",
     "passport": "^0.2.1",
     "passport-facebook": "^1.0.3"
   }
