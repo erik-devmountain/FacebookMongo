@@ -12,13 +12,14 @@ var Session = require('express-session');
 var Passport = require('passport');
 var FacebookStrategy = require('passport-facebook').Strategy;
 var Mongoose = require('mongoose');
-var MongoJS = require('mongojs');
+var BodyParser = require('body-parser');
+// var MongoJS = require('mongojs');
 
 //files
 
 var fakeData = require('./seed-data');
-
 var controller = require('./lib/controllers/main-control');
+var Agent = require('./lib/models/agent');
 
 //environment variables
 
@@ -32,17 +33,34 @@ App.use(Session({secret: 'SOMETHING_SIKRIT'}));
 App.use(Passport.initialize());
 App.use(Passport.session());
 
+App.use(BodyParser.json());
+
 // Saves our agent
 
-// controller.saveAgent(fakeData[2]);
+// controller.saveAgent(fakeData.agents[1]);
+
+App.post('/api/agent', function(req, res){
+	console.log('CREATING AN AGENT.');
+	Agent.create(req.body)
+		.then(function(response){
+			res.json(response);
+		},function(err){
+			res.status(500).json(err);
+		})
+})
+
+// Agent.remove({ _id: '54dcf298bd17a96721122c8b' }, function(err, response){
+// 	console.log(err, response);
+// });
+
 
 // Saves our manufacturer
 
-// controller.saveManufacturer(fakeData[3]);
+// controller.saveManufacturer(fakeData.manufacturers[0]);
 
 // Saves our car
 
-// controller.saveCar(fakeData[1]);
+// controller.saveCar(fakeData.cars[0]);
 
 // Gets our car
 
@@ -59,8 +77,8 @@ Passport.use(new FacebookStrategy({
 	clientSecret: '7f61fe8de4d1f9ffc2061d89073a73bb',
 	callbackURL: 'http://localhost:9001/auth/facebook/callback'
 }, function(token, refreshToken, profile, done){
-	return done(null, profile);
-}));
+	return done(null, profile)
+;}));
 
 Passport.serializeUser(function(user, done){
 	done(null, user);
@@ -68,7 +86,7 @@ Passport.serializeUser(function(user, done){
 
 Passport.deserializeUser(function(obj, done){
 	done(null, obj);
-})
+});
 
 var isAuthed = function(req, res, next){
 	if(!req.isAuthenticated()){
@@ -93,24 +111,26 @@ App.get('/auth/facebook/callback',
 			failureRedirect: '/failure'
 		}
 	)
-)
 
+)
 
 //connection stuff ==========================
 
-var db = MongoJS('facebook-mongo', ['agents', 'cars', 'manufacturers']);
+// var db = MongoJS('facebook-mongo', ['agents', 'cars', 'manufacturers']);
 
 // db.agents.save({
-// 	name: 'Jacob Turner',
-// 	age: true,
-// 	nationality: 27,
-// 	occupation: 'Undercover Mentor',
-// 	hasLicenseToKill: true,
-// 	weapons: [{
-// 		kind: 'OS',
-// 		name: {},
-// 		numberOfRounds: NaN,
-// 	}]
+// 	name: null,
+// 	age: 'Private',
+// 	nationality: 'British',
+// 	occupation: 'British Spy',
+// 	licenseToKill: 20,
+// 	weapons: [
+// 		{
+// 			kind: 'Handbag',
+// 			name: 'Gucci',
+// 			numberOfRounds: 1
+// 		}
+// 	]
 // })
 
 // db.agents.find(function(err, docs){
@@ -119,12 +139,12 @@ var db = MongoJS('facebook-mongo', ['agents', 'cars', 'manufacturers']);
 
 // db.agents.remove({name: 'Jacob Turner'});
 
-Mongoose.connect(mongoURI)
+Mongoose.connect(mongoURI);
 
 Mongoose.connection.once('open', function(){
-	console.log('Successfully connected to Mongo via: ' + mongoURI)
-})
+	console.log('Successfully connected to Mongo via: ' + mongoURI);
+});
 
 App.listen(port, function(){
-	console.log('Now listening on port: ' + port)
+	console.log('Now listening on port: ' + port);
 });

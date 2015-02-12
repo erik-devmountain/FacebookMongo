@@ -1,5 +1,5 @@
-module.exports = [
-	{
+module.exports = {
+	"autobots": [{
 		"name": "Optimus Prime",
 		"composition": [
 			"Metal",
@@ -14,9 +14,9 @@ module.exports = [
 			"Silver"
 		],
 		"faction": "Autobots"
-	},
+	}],
 
-	{
+	"cars": [{
 		"name": "Audi R8",
 		"manufacturer": "audi",
 		"cylinders": 8,
@@ -24,9 +24,9 @@ module.exports = [
 		"Gears": 7,
 		"doors": 2,
 		"msrp": 115000
-	},
+	}],
 
-	{
+	"agents": [{
 		"name": "James Bond",
 		"age": 40,
 		"nationality": "English",
@@ -46,10 +46,23 @@ module.exports = [
 			}
 		]
 	},
-
 	{
+		name: 'Someone Incredible',
+		age: 21,
+		nationality: 'British',
+		occupation: 'British Spy',
+		licenseToKill: true,
+		weapons: [
+			{
+				kind: 'Handbag',
+				name: 'Gucci',
+				numberOfRounds: 1
+			}
+		]
+	}],
+	"manufacturers": [{
 		"_id": "audi",
 		"name": "Audi",
 		"nationality": "Germany"
-	}
-]
+	}]
+}
